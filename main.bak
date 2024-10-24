@@ -1,0 +1,288 @@
+// package main
+
+// import (
+// 	"log"
+// 	"math"
+// 	"math/rand"
+// 	"time"
+
+// 	ui "github.com/gizak/termui/v3"
+// 	"github.com/gizak/termui/v3/widgets"
+// )
+
+// type Panel int
+
+// const (
+//     PanelCPU Panel = iota
+//     PanelMemory
+//     PanelDisk
+//     PanelNetwork
+//     PanelProcess
+//     PanelSystem
+//     PanelMenu
+// )
+
+// type Monitor struct {
+//     cpuChart    *widgets.Plot
+//     memChart    *widgets.Plot
+//     diskGauge   *widgets.Gauge
+//     sparkline   *widgets.Sparkline
+//     sparklines  *widgets.SparklineGroup
+//     table       *widgets.Table
+//     list        *widgets.List
+//     menu        *widgets.List
+//     activePanel Panel
+//     showMenu    bool
+// }
+
+// func NewMonitor() *Monitor {
+//     m := &Monitor{
+//         activePanel: PanelCPU,
+//         showMenu:    false,
+//     }
+    
+//     // CPU使用率图表
+//     m.cpuChart = widgets.NewPlot()
+//     m.cpuChart.Title = "CPU Usage"
+//     m.cpuChart.Data = make([][]float64, 1)
+//     m.cpuChart.Data[0] = make([]float64, 100)
+//     m.cpuChart.LineColors[0] = ui.ColorGreen
+//     m.cpuChart.AxesColor = ui.ColorWhite
+//     m.cpuChart.BorderStyle.Fg = ui.ColorWhite
+    
+//     // 内存使用图表
+//     m.memChart = widgets.NewPlot()
+//     m.memChart.Title = "Memory Usage"
+//     m.memChart.Data = make([][]float64, 1)
+//     m.memChart.Data[0] = make([]float64, 100)
+//     m.memChart.LineColors[0] = ui.ColorYellow
+//     m.memChart.AxesColor = ui.ColorWhite
+//     m.memChart.BorderStyle.Fg = ui.ColorWhite
+
+//     // 磁盘使用量
+//     m.diskGauge = widgets.NewGauge()
+//     m.diskGauge.Title = "Disk Usage"
+//     m.diskGauge.Percent = 75
+//     m.diskGauge.BarColor = ui.ColorBlue
+//     m.diskGauge.BorderStyle.Fg = ui.ColorWhite
+    
+//     // 网络流量
+//     m.sparkline = widgets.NewSparkline()
+//     m.sparkline.Title = "Network Traffic"
+//     m.sparkline.Data = make([]float64, 50)
+//     m.sparkline.LineColor = ui.ColorRed
+
+//     m.sparklines = widgets.NewSparklineGroup(m.sparkline)
+//     m.sparklines.Title = "Network Monitor"
+//     m.sparklines.BorderStyle.Fg = ui.ColorWhite
+
+//     // 进程列表
+//     m.table = widgets.NewTable()
+//     m.table.Title = "Process List"
+//     m.table.Rows = [][]string{
+//         {"PID", "Name", "CPU%", "MEM%"},
+//         {"1234", "chrome", "15.0", "25.5"},
+//         {"5678", "vscode", "10.2", "15.7"},
+//         {"9012", "terminal", "5.5", "8.3"},
+//     }
+//     m.table.BorderStyle.Fg = ui.ColorWhite
+//     m.table.TextStyle = ui.NewStyle(ui.ColorWhite)
+//     m.table.RowSeparator = true
+//     m.table.FillRow = true
+
+//     // 系统信息
+//     m.list = widgets.NewList()
+//     m.list.Title = "System Info"
+//     m.list.Rows = []string{
+//         "OS: Linux 5.15.0",
+//         "CPU: Intel i7-9750H",
+//         "Memory: 16GB DDR4",
+//         "Disk: 512GB SSD",
+//     }
+//     m.list.BorderStyle.Fg = ui.ColorWhite
+
+//     // 菜单
+//     m.menu = widgets.NewList()
+//     m.menu.Title = "Menu"
+//     m.menu.Rows = []string{
+//         "1. Show CPU Details",
+//         "2. Show Memory Details",
+//         "3. Show Disk Details",
+//         "4. Show Network Details",
+//         "5. Show Process Details",
+//         "6. Export Data",
+//         "7. Settings",
+//         "8. Help",
+//         "",
+//         "Press 'q' to quit",
+//         "Press 'Tab' to switch panels",
+//         "Press 'm' to toggle menu",
+//     }
+//     m.menu.BorderStyle.Fg = ui.ColorYellow
+//     m.menu.TextStyle = ui.NewStyle(ui.ColorYellow)
+
+//     return m
+// }
+
+// func (m *Monitor) updateData() {
+//     // 更新CPU数据
+//     for i := 0; i < len(m.cpuChart.Data[0])-1; i++ {
+//         m.cpuChart.Data[0][i] = m.cpuChart.Data[0][i+1]
+//     }
+//     m.cpuChart.Data[0][len(m.cpuChart.Data[0])-1] = math.Sin(float64(time.Now().UnixNano())/1000000000)*50 + 50
+
+//     // 更新内存数据
+//     for i := 0; i < len(m.memChart.Data[0])-1; i++ {
+//         m.memChart.Data[0][i] = m.memChart.Data[0][i+1]
+//     }
+//     m.memChart.Data[0][len(m.memChart.Data[0])-1] = rand.Float64() * 100
+
+//     // 更新网络数据
+//     for i := 0; i < len(m.sparkline.Data)-1; i++ {
+//         m.sparkline.Data[i] = m.sparkline.Data[i+1]
+//     }
+//     m.sparkline.Data[len(m.sparkline.Data)-1] = rand.Float64() * 100
+// }
+
+// func (m *Monitor) highlightActivePanel() {
+//     // 重置所有面板边框颜色
+//     m.cpuChart.BorderStyle.Fg = ui.ColorWhite
+//     m.memChart.BorderStyle.Fg = ui.ColorWhite
+//     m.diskGauge.BorderStyle.Fg = ui.ColorWhite
+//     m.sparklines.BorderStyle.Fg = ui.ColorWhite
+//     m.table.BorderStyle.Fg = ui.ColorWhite
+//     m.list.BorderStyle.Fg = ui.ColorWhite
+    
+//     // 高亮当前活动面板
+//     switch m.activePanel {
+//     case PanelCPU:
+//         m.cpuChart.BorderStyle.Fg = ui.ColorCyan
+//     case PanelMemory:
+//         m.memChart.BorderStyle.Fg = ui.ColorCyan
+//     case PanelDisk:
+//         m.diskGauge.BorderStyle.Fg = ui.ColorCyan
+//     case PanelNetwork:
+//         m.sparklines.BorderStyle.Fg = ui.ColorCyan
+//     case PanelProcess:
+//         m.table.BorderStyle.Fg = ui.ColorCyan
+//     case PanelSystem:
+//         m.list.BorderStyle.Fg = ui.ColorCyan
+//     case PanelMenu:
+//         m.menu.BorderStyle.Fg = ui.ColorCyan
+//     }
+// }
+
+// func (m *Monitor) nextPanel() {
+//     m.activePanel = (m.activePanel + 1) % 7
+//     m.highlightActivePanel()
+// }
+
+// func (m *Monitor) layout() {
+//     termWidth, termHeight := ui.TerminalDimensions()
+//     gridHeight := termHeight / 2
+    
+//     if m.showMenu {
+//         // 当显示菜单时，调整布局
+//         menuWidth := termWidth / 4
+//         m.menu.SetRect(termWidth-menuWidth, 0, termWidth, termHeight)
+        
+//         // 调整其他组件的大小以适应菜单
+//         m.cpuChart.SetRect(0, 0, (termWidth-menuWidth)/2, gridHeight)
+//         m.memChart.SetRect((termWidth-menuWidth)/2, 0, termWidth-menuWidth, gridHeight)
+//         m.diskGauge.SetRect(0, gridHeight, (termWidth-menuWidth)/2, gridHeight+3)
+//         m.sparklines.SetRect((termWidth-menuWidth)/2, gridHeight, termWidth-menuWidth, gridHeight+3)
+//         m.table.SetRect(0, gridHeight+3, (termWidth-menuWidth)/2, termHeight)
+//         m.list.SetRect((termWidth-menuWidth)/2, gridHeight+3, termWidth-menuWidth, termHeight)
+//     } else {
+//         // 常规布局（无菜单）
+//         m.cpuChart.SetRect(0, 0, termWidth/2, gridHeight)
+//         m.memChart.SetRect(termWidth/2, 0, termWidth, gridHeight)
+//         m.diskGauge.SetRect(0, gridHeight, termWidth/2, gridHeight+3)
+//         m.sparklines.SetRect(termWidth/2, gridHeight, termWidth, gridHeight+3)
+//         m.table.SetRect(0, gridHeight+3, termWidth/2, termHeight)
+//         m.list.SetRect(termWidth/2, gridHeight+3, termWidth, termHeight)
+//     }
+// }
+
+// func main() {
+//     if err := ui.Init(); err != nil {
+//         log.Fatalf("failed to initialize termui: %v", err)
+//     }
+//     defer ui.Close()
+
+//     monitor := NewMonitor()
+    
+//     draw := func() {
+//         monitor.layout()
+//         monitor.highlightActivePanel()
+//         ui.Render(monitor.cpuChart, monitor.memChart, monitor.diskGauge, 
+//                  monitor.sparklines, monitor.table, monitor.list)
+//         if monitor.showMenu {
+//             ui.Render(monitor.menu)
+//         }
+//     }
+
+//     draw()
+
+//     uiEvents := ui.PollEvents()
+//     ticker := time.NewTicker(time.Second / 2).C
+
+//     for {
+//         select {
+//         case e := <-uiEvents:
+//             switch e.ID {
+//             case "q", "<C-c>":
+//                 return
+//             case "<Resize>":
+//                 draw()
+//             case "<Tab>":
+//                 monitor.nextPanel()
+//             case "m":
+//                 monitor.showMenu = !monitor.showMenu
+//             case "<Up>":
+//                 if monitor.activePanel == PanelProcess {
+//                     // monitor.table.ScrollUp()
+//                 } else if monitor.activePanel == PanelSystem {
+//                     monitor.list.ScrollUp()
+//                 } else if monitor.activePanel == PanelMenu {
+//                     monitor.menu.ScrollUp()
+//                 }
+//             case "<Down>":
+//                 if monitor.activePanel == PanelProcess {
+//                     // monitor.table.ScrollDown()
+//                 } else if monitor.activePanel == PanelSystem {
+//                     monitor.list.ScrollDown()
+//                 } else if monitor.activePanel == PanelMenu {
+//                     monitor.menu.ScrollDown()
+//                 }
+//             case "<Enter>":
+//                 if monitor.activePanel == PanelMenu {
+//                     // 处理菜单选择
+//                     switch monitor.menu.SelectedRow {
+//                     case 0: // CPU Details
+//                         monitor.activePanel = PanelCPU
+//                         monitor.showMenu = false
+//                     case 1: // Memory Details
+//                         monitor.activePanel = PanelMemory
+//                         monitor.showMenu = false
+//                     case 2: // Disk Details
+//                         monitor.activePanel = PanelDisk
+//                         monitor.showMenu = false
+//                     case 3: // Network Details
+//                         monitor.activePanel = PanelNetwork
+//                         monitor.showMenu = false
+//                     case 4: // Process Details
+//                         monitor.activePanel = PanelProcess
+//                         monitor.showMenu = false
+//                     }
+//                 }
+//             }
+//             draw()
+//         case <-ticker:
+//             monitor.updateData()
+//             draw()
+//         }
+//     }
+// }
+
+
